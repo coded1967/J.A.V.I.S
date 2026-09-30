@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#04121c">
+<link rel="manifest" href="manifest.json">
+<title>J.A.R.V.I.S.</title>
+<style>
+:root{--a:#00e5ff;--d:#0d5a5e;--t:#d8faff;--ok:#7dffb0}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:#020d12 center/cover no-repeat;color:var(--t);font-family:"Arial Narrow",Roboto,"Trebuchet MS",sans-serif;overflow:hidden}
+#app{position:relative;height:100%;display:flex;flex-direction:column;padding:env(safe-area-inset-top,0) 8px env(safe-area-inset-bottom,0);background:radial-gradient(circle at 50% 35%,rgba(10,70,80,.35),rgba(2,13,18,.92) 70%)}
+header{display:flex;align-items:center;justify-content:space-between;height:40px;flex:none}
+#hint{width:120px;font-size:15px;letter-spacing:1px;color:var(--a);text-shadow:0 0 6px #000}
+.ttl{font-style:italic;font-size:20px;letter-spacing:4px;color:var(--a);text-shadow:0 0 8px #000}
+button{font:inherit;color:var(--a);background:rgba(6,30,38,.85);border:1px solid var(--d);border-radius:6px;padding:8px 4px;cursor:pointer}
+button:active{background:var(--d);color:#fff}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #fff;outline-offset:2px}
+#help{width:34px;height:34px;border-radius:50%;padding:0;font-style:italic;font-size:18px}
+main{flex:1;min-height:0;position:relative;display:flex;flex-direction:column;align-items:center}
+.cw{flex:1;min-height:0;width:100%;display:flex;justify-content:center}
+#rc{height:100%;max-width:100%;aspect-ratio:1/1}
+#sub{min-height:40px;padding:2px 8px;text-align:center;font-size:16px;line-height:1.3;max-width:36ch;text-shadow:0 0 4px #000,0 0 8px #000,0 2px 2px #000}
+#links{text-align:center}
+.lk{display:inline-block;margin:2px auto 4px;padding:9px 16px;background:var(--a);color:#04121c;font-weight:bold;border-radius:6px;text-decoration:none}
+#log{position:absolute;inset:0;z-index:3;overflow-y:auto;background:rgba(6,26,34,.93);border:1px solid var(--d);padding:8px;font-size:14px;line-height:1.4;white-space:pre-wrap}
+#log .J{color:var(--a);margin-bottom:8px}#log .U{color:var(--ok);margin-bottom:8px}
+.row{display:flex;gap:8px;flex:none;margin-top:6px}
+.pn{flex:1;background:rgba(6,40,48,.72);border:1px solid var(--d);box-shadow:inset 0 0 12px rgba(0,0,0,.5);padding:0 8px 6px;min-height:78px}
+.pn h4{margin:0 -8px 4px;padding:3px 8px;background:var(--d);color:#fff;font-size:13px;letter-spacing:1px;text-align:right}
+.big{font-size:42px;line-height:1;font-weight:300;color:#fff}
+.sm{font-size:12px;color:var(--a);min-height:14px}
+#earb,#vo{flex:1;height:36px;font-size:13px;letter-spacing:1px;border-radius:0}
+#grid{display:flex;gap:6px;overflow-x:auto;flex:none;margin-top:6px;scrollbar-width:none}
+#grid button{flex:none;height:36px;padding:0 14px;font-size:13px;border-radius:18px}
+#bar{display:flex;gap:6px;flex:none;margin-top:6px}
+#cmd{flex:1;min-width:0;font:inherit;font-size:16px;background:rgba(6,30,38,.9);color:var(--t);border:1px solid var(--d);border-radius:6px;padding:11px 8px}
+#go{background:var(--a);color:#04121c;font-weight:bold;width:66px}
+nav{display:flex;align-items:center;justify-content:space-around;flex:none;height:62px;margin:6px -8px 0;background:rgba(2,20,26,.96);border-top:1px solid var(--d)}
+nav button{background:none;border:0;font-size:24px;width:54px;height:54px;padding:0;border-radius:50%}
+nav .on{color:#fff;background:var(--d)}
+nav #mic{width:64px;height:64px;border:2px solid var(--a);font-size:28px;margin-top:-16px;background:#031a20}
+nav #mic.on{background:#ff3b3b;border-color:#ff3b3b;color:#fff}
+#viewer{position:absolute;inset:0;background:#000;display:flex;flex-direction:column;z-index:5;padding:env(safe-area-inset-top,0) 8px env(safe-area-inset-bottom,0)}
+#viewer[hidden],#log[hidden],#sub[hidden]{display:none}
+#vimg{flex:1;min-height:0;width:100%;object-fit:contain}
+#cap{text-align:center;color:var(--a);padding:6px;font-size:13px}
+#vb{display:flex;gap:4px;margin-bottom:6px}#vb button{flex:1;padding:12px 4px}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style></head><body>
+<div id="app">
+<header><span id="hint">LISTENING OFF</span><b class="ttl">JARVIS</b><button id="help" aria-label="Help">i</button></header>
+<main><div class="cw"><canvas id="rc" width="600" height="600" aria-label="Jarvis clock"></canvas></div><div id="sub">Initializing...</div><div id="links"></div><div id="log" hidden></div></main>
+<div class="row"><div class="pn"><h4 id="wc">LOCATING</h4><div class="big" id="wt">--</div><div class="sm" id="wd"></div></div><div class="pn"><h4><span id="dm"></span> <span id="dy"></span></h4><div class="big" id="dd"></div><div class="sm" id="dw"></div></div></div>
+<div class="row"><button id="earb">EAR: OFF</button><button id="vo">VOICE: ON</button></div>
+<div id="grid"></div>
+<form id="bar"><input id="cmd" autocomplete="off" autocapitalize="none" placeholder="Type your command, sir..." aria-label="Command"><button id="go">SEND</button></form>
+<input type="file" id="bgf" accept="image/*" hidden>
+<nav><button id="nth" aria-label="Change theme">&#9673;</button><button id="nbg" aria-label="Set background">&#9635;</button><button type="button" id="mic" aria-label="Speak">&#127908;</button><button id="chatb" aria-label="Chat log">&#9776;</button><button id="ncl" aria-label="Close">&#10005;</button></nav>
+<div id="viewer" hidden><img id="vimg" alt=""><div id="cap"></div><div id="vb"><button id="vp">PREV</button><button id="vn">NEXT</button><button id="vc">CLOSE</button></div></div>
+</div>
+<script>
+const $=i=>document.getElementById(i),T='sir';
+let S={notes:[],todo:[],contacts:{},theme:'cyan',bg:null};
+try{Object.assign(S,JSON.parse(localStorage.getItem('jv')||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem('jv',JSON.stringify(S))}catch(e){say('Storage is full or blocked.',0)}};
+const TH={cyan:['#00e5ff','#0a5566'],red:['#ff3b3b','#661a1a'],gold:['#ffc93c','#66500f'],green:['#39ff88','#116633'],purple:['#c77dff','#4a2a66']};
+function theme(n){const t=TH[n];if(!t)return false;S.theme=n;const s=document.documentElement.style;s.setProperty('--a',t[0]);s.setProperty('--d',t[1]);save();return true}
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const JOKES=["I would tell you a UDP joke, but you might not get it.","Why do programmers prefer dark mode? Light attracts bugs.","There are 10 kinds of people: those who know binary and those who don't.","A SQL query walks into a bar and asks two tables: can I join you?"];
+const FACTS=["Honey never spoils. Edible honey was found in ancient Egyptian tombs.","Octopuses have three hearts and blue blood.","A day on Venus is longer than its year.","The first computer bug was a real moth found in a Harvard computer in 1947."];
+const RID=[["What has keys but can't open locks?","A keyboard."],["What has hands but can't clap?","A clock."],["What gets wetter the more it dries?","A towel."]];
+const SITES={google:'google.com',youtube:'youtube.com',yt:'youtube.com',gmail:'mail.google.com',maps:'maps.google.com',drive:'drive.google.com',facebook:'facebook.com',instagram:'instagram.com',twitter:'x.com',x:'x.com',reddit:'reddit.com',github:'github.com',netflix:'netflix.com',spotify:'open.spotify.com',amazon:'amazon.com',wikipedia:'wikipedia.org',tiktok:'tiktok.com',snapchat:'snapchat.com',discord:'discord.com/app',linkedin:'linkedin.com',chatgpt:'chat.openai.com',claude:'claude.ai'};
+const APPS={whatsapp:'whatsapp://',telegram:'tg://',instagram:'instagram://app',spotify:'spotify://',snapchat:'snapchat://',tiktok:'snssdk1128://'};
+let voices=[],speaking=false,voiceOn=true,listening=false,ear=false,riddle=null;
+const loadV=()=>{voices=speechSynthesis.getVoices()};try{loadV();speechSynthesis.onvoiceschanged=loadV}catch(e){}
+function speak(t){if(!voiceOn||!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t.replace(/[*_#<>|]/g,' ').slice(0,300));const v=voices.find(v=>/en-GB/i.test(v.lang)&&/male|daniel/i.test(v.name))||voices.find(v=>/en-GB/i.test(v.lang))||voices.find(v=>/^en/i.test(v.lang));if(v)u.voice=v;u.pitch=.85;u.rate=.98;u.onstart=()=>speaking=true;u.onend=u.onerror=()=>{speaking=false};speechSynthesis.speak(u)}
+function addLog(w,t){const d=document.createElement('div');d.className=w;d.textContent=(w=='J'?'JARVIS: ':'> ')+t;$('log').append(d);$('log').scrollTop=1e9}
+function showLog(v){$('log').hidden=!v;$('sub').hidden=!!v;$('chatb').classList.toggle('on',!!v)}
+function say(m,sp=1){addLog('J',m);if(m.length>240||m.split('\n').length>3)showLog(1);else{$('sub').textContent=m}if(sp)speak(m.split('\n')[0])}
+function link(url,label){const a=document.createElement('a');a.href=url;a.className='lk';a.textContent='TAP TO OPEN '+label.toUpperCase();if(/^https?:/.test(url))a.target='_blank';$('links').replaceChildren(a)}
+function go(url,label){link(url,label);say('Opening '+label+', '+T+'.');try{/^https?:/.test(url)?window.open(url,'_blank'):location.href=url}catch(e){}}
+const j=async u=>(await fetch(u)).json(),tx=async u=>(await fetch(u)).text();
+function secs(n,u){u=(u||'s')[0];return u=='h'?n*3600:u=='m'?n*60:n}
+function guess(n){n=n.toLowerCase().replace(/^(the|website|site|app)\s+|\s+(website|site|app)$/g,'').trim();if(SITES[n])return'https://'+SITES[n];if(/^https?:/.test(n))return n;if(/\.\w{2,}$/.test(n)&&!/\s/.test(n))return'https://'+n;return'https://www.'+n.replace(/\s+/g,'')+'.com'}
+function num(t){t=t.toLowerCase().trim();if(S.contacts[t])return S.contacts[t];return/^\+?[\d\s\-()]{7,20}$/.test(t)?t.replace(/\D/g,''):null}
+/* pictures */
+let pics=[],pi=0,pq='';
+async function findPics(q){const o=[];try{const r=await j('https://en.wikipedia.org/w/api.php?origin=*&action=query&generator=search&gsrsearch='+encodeURIComponent(q)+'&gsrlimit=8&prop=pageimages&piprop=thumbnail&pithumbsize=900&format=json');Object.values(r.query?.pages||{}).sort((a,b)=>a.index-b.index).forEach(p=>p.thumbnail&&o.push(p.thumbnail.source))}catch(e){}
+try{const r=await j('https://commons.wikimedia.org/w/api.php?origin=*&action=query&generator=search&gsrnamespace=6&gsrsearch='+encodeURIComponent(q+' filetype:bitmap')+'&gsrlimit=12&prop=imageinfo&iiprop=url|mime&iiurlwidth=900&format=json');Object.values(r.query?.pages||{}).sort((a,b)=>a.index-b.index).forEach(p=>{const i=(p.imageinfo||[])[0];if(i&&/jpeg|png/.test(i.mime))o.push(i.thumburl||i.url)})}catch(e){}
+return[...new Set(o)]}
+async function showPics(q){q=q.replace(/^(a|an|the|some)\s+/i,'');say('Searching for pictures of '+q+', '+T+'...');pics=await findPics(q);pq=q;if(!pics.length)return say("I couldn't find any pictures of "+q+', '+T+'.');pi=0;showPic()}
+function showPic(){$('vimg').onerror=()=>{if(pics.length>1){pics.splice(pi,1);pi%=pics.length;showPic()}};$('vimg').src=pics[pi];$('cap').textContent=pq+'  ('+(pi+1)+'/'+pics.length+')';$('viewer').hidden=false;if(!$('viewer').dataset.said){}}
+const step=d=>{if(!pics.length)return say('There are no pictures loaded, '+T+'.');pi=(pi+d+pics.length)%pics.length;showPic()};
+$('vn').onclick=()=>step(1);$('vp').onclick=()=>step(-1);$('vc').onclick=()=>{$('viewer').hidden=true};
+/* commands */
+const R=[
+[/^(?:show|display|find|get|bring up|pull up)?(?:\s+me)?\s*(?:a |an |the |some )?(?:picture|photo|image|pic)s?\s+(?:of|for)\s+(.+)$/i,m=>showPics(m[1])],
+[/^(?:close|hide|back)(?: (?:picture|image|chat))?$/i,()=>{$('viewer').hidden=true;showLog(0)}],
+[/^(?:next|another)(?: (?:one|picture|image))?$/i,()=>step(1)],
+[/^(?:previous|prev|last picture)$/i,()=>step(-1)],
+[/^(?:pick|choose|change|set)(?: a| the| my)? (?:background|wallpaper|picture)$/i,()=>$('bgf').click()],
+[/^(?:background|wallpaper) (?:clear|off|remove)$/i,()=>{S.bg=null;save();applyBg();say('Background cleared, '+T+'.')}],
+[/^(?:change )?(?:theme|colou?r)(?: (\w+))?$/i,m=>{let n=(m[1]||'next').toLowerCase(),k=Object.keys(TH);if(n=='next')n=k[(k.indexOf(S.theme)+1)%k.length];if(n=='blue')n='cyan';theme(n)?say('Theme set to '+n+', '+T+'.'):say('Themes: '+k.join(', ')+'.')}],
+[/^(?:send (?:a )?(?:whatsapp )?(?:message|text) to|whatsapp|message|msg|text)\b\s*(.*)$/i,m=>{const r=m[1].replace(/^to\s+/i,'').trim();if(!r)return go(APPS.whatsapp,'WhatsApp');const p=r.split(/\s+/),n=num(p[0]);if(!n)return say("I don't know "+p[0]+', '+T+'. Say: contact add name number.');go('https://wa.me/'+n+'?text='+encodeURIComponent(p.slice(1).join(' ')),'WhatsApp chat')}],
+[/^(?:open|go to|goto|launch|visit|take me to|start)\s+(.+)$/i,m=>{const n=m[1].toLowerCase().replace(/\s+app$/,'').trim();if(n=='camera'||n=='settings'||n=='calculator'||n=='clock')return say("A web app can't open "+n+', '+T+'. Use your home screen.');APPS[n]?go(APPS[n],n):go(guess(m[1]),m[1])}],
+[/^contact add (\S+)\s+(\+?[\d\s\-()]{7,20})$/i,m=>{S.contacts[m[1].toLowerCase()]=m[2].replace(/\D/g,'');save();say('Contact '+m[1]+' saved, '+T+'.')}],
+[/^contacts$/i,()=>{const b=Object.entries(S.contacts).map(([k,v])=>k+': '+v).join('\n');say(b?'Your contacts, '+T+':\n'+b:'No contacts yet. Say: contact add mom 15551234567')}],
+[/^(?:call|dial|ring)\s+(.+)$/i,m=>{const n=num(m[1]);n?go('tel:'+n,'the dialer'):say("I don't know "+m[1]+', '+T+'.')}],
+[/^sms\s+(\S+)\s*(.*)$/i,m=>{const n=num(m[1]);n?go('sms:'+n+'?body='+encodeURIComponent(m[2]),'messages'):say("I don't know "+m[1]+', '+T+'.')}],
+[/^(?:navigate|directions|route)(?: to)?\s+(.+)$/i,m=>go('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(m[1]),'maps')],
+[/^translate\s+(.+)$/i,m=>go('https://translate.google.com/?sl=auto&tl=en&text='+encodeURIComponent(m[1]),'the translator')],
+[/^(?:search|google|look up)(?: for)?\s+(.+)$/i,m=>go('https://www.google.com/search?q='+encodeURIComponent(m[1]),'Google')],
+[/^(?:youtube|yt|play)\s+(.+)$/i,m=>go('https://www.youtube.com/results?search_query='+encodeURIComponent(m[1]),'YouTube')],
+[/^(?:help|commands|what can you do)$/i,()=>say('Certainly, '+T+'. Say things like:\nopen whatsapp / google / youtube\nwhatsapp mom running late\ncontact add mom 15551234567\ncall mom | navigate <place>\nshow me a picture of a lion\nnext | previous | close\nweather <city> | wiki <topic> | define <word>\nsearch <text> | play <song>\ncalc 5*8 | timer 5 minutes\nremind me in 10 minutes to <task>\nnote <text> | notes | todo add <task> | todo list\njoke | fact | riddle | flip | roll | briefing\ntheme red | pick background | voice off | battery')],
+[/^voice (on|off)$/i,m=>{voiceOn=m[1].toLowerCase()=='on';$('vo').textContent='VOICE: '+(voiceOn?'ON':'OFF');say('Voice '+(voiceOn?'enabled':'disabled')+', '+T+'.')}],
+[/^say\s+(.+)$/i,m=>say(m[1])],
+[/^(?:what(?:'s| is)(?: the)? time|what time is it|time|the time)$/i,()=>say('The time is '+new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})+', '+T+'.')],
+[/^(?:what(?:'s| is)(?: the)? (?:date|day)|what day is it|date|today)$/i,()=>say('Today is '+new Date().toLocaleDateString([],{weekday:'long',month:'long',day:'numeric',year:'numeric'})+', '+T+'.')],
+[/^battery$/i,async()=>{try{const b=await navigator.getBattery();say('Battery is at '+Math.round(b.level*100)+' percent, '+T+'.')}catch(e){say("I can't read the battery here, "+T+'.')}}],
+[/^clear$/i,()=>{$('log').replaceChildren();$('sub').textContent='';$('links').replaceChildren()}],
+[/^weather(?: in| for)?\s*(.*)$/i,async m=>{say('Checking the skies...',0);try{say('Here is the weather, '+T+': '+(await tx('https://wttr.in/'+encodeURIComponent(m[1])+'?format=3')).trim())}catch(e){say('The weather service is offline, '+T+'.')}}],
+[/^briefing|^brief me$|^good morning$/i,async()=>{const o=S.todo.filter(t=>!t.d).length;let w='';try{w=' Weather: '+(await tx('https://wttr.in/?format=3')).trim()}catch(e){}say('Your briefing, '+T+'. It is '+new Date().toLocaleString([],{weekday:'long',hour:'numeric',minute:'2-digit'})+'. You have '+o+' open tasks.'+w)}],
+[/^define\s+(.+)$/i,async m=>{try{const d=await j('https://api.dictionaryapi.dev/api/v2/entries/en/'+encodeURIComponent(m[1]));say(m[1]+': '+d[0].meanings[0].definitions[0].definition)}catch(e){say('I found no definition for '+m[1]+', '+T+'.')}}],
+[/^(?:wiki|wikipedia|who is|who was|what is|what are|tell me about)\s+(.+)$/i,async m=>{say('Searching the archives...',0);try{const d=await j('https://en.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(m[1].replace(/ /g,'_')));say('Here is what I found, '+T+': '+d.extract)}catch(e){say('I found no records on that, '+T+'.')}}],
+[/^(?:calc|calculate|math)\s+(.+)$/i,m=>{let e=m[1].toLowerCase().replace(/x/g,'*').replace(/\^/g,'**');const ok=['sqrt','sin','cos','tan','log','abs','round','floor','ceil','pi'];if(e.length>60||!/^[0-9+\-*/().%, a-z]*$/.test(e)||(e.match(/[a-z]+/g)||[]).some(w=>!ok.includes(w)))return say('That expression is invalid, '+T+'.');try{say('The answer is '+Function(...ok,'return ('+e+')')(...ok.map(k=>k=='pi'?Math.PI:Math[k]))+', '+T+'.')}catch(x){say('I hit a math error, '+T+'.')}}],
+[/^(?:set (?:a )?)?timer (?:for )?(\d+)\s*(seconds?|secs?|minutes?|mins?|hours?|hrs?)?(?: (.+))?$/i,m=>{setTimeout(()=>say('Your timer '+(m[3]||'')+' has finished, '+T+'.'),secs(+m[1],m[2])*1000);say('Timer set for '+m[1]+' '+(m[2]||'seconds')+', '+T+'. Keep this page open.')}],
+[/^remind me in (\d+)\s*(seconds?|secs?|minutes?|mins?|hours?|hrs?)\s*(?:to\s+)?(.*)$/i,m=>{setTimeout(()=>say('Reminder, '+T+': '+(m[3]||'your reminder')),secs(+m[1],m[2])*1000);say("I'll remind you in "+m[1]+' '+m[2]+', '+T+'. Keep this page open.')}],
+[/^note\s+(.+)$/i,m=>{S.notes.push(m[1]);save();say('Note saved, '+T+'.')}],
+[/^notes$/i,()=>say(S.notes.length?'Your notes, '+T+':\n'+S.notes.map((n,i)=>(i+1)+'. '+n).join('\n'):'You have no notes, '+T+'.')],
+[/^clear ?notes$/i,()=>{S.notes=[];save();say('All notes cleared, '+T+'.')}],
+[/^todo add (.+)$/i,m=>{S.todo.push({t:m[1],d:0});save();say('Task added, '+T+'.')}],
+[/^(?:todo list|todo|tasks)$/i,()=>say(S.todo.length?'Your tasks, '+T+':\n'+S.todo.map((t,i)=>(i+1)+'. ['+(t.d?'x':' ')+'] '+t.t).join('\n'):'No tasks pending, '+T+'.')],
+[/^todo (?:done|finish|complete) (\d+)$/i,m=>{const t=S.todo[m[1]-1];if(!t)return say('That task number is invalid, '+T+'.');t.d=1;save();say('Task marked complete, '+T+'.')}],
+[/^password(?: (\d+))?$/i,m=>{const n=Math.min(64,+m[1]||16),c='abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%&*',a=crypto.getRandomValues(new Uint32Array(n));addLog('J','Your new password, '+T+': '+[...a].map(x=>c[x%c.length]).join(''));showLog(1);speak('Your new password is on screen, '+T+'.')}],
+[/^(?:joke|tell me a joke)$/i,()=>say(pick(JOKES)+' Forgive me, '+T+'.')],
+[/^(?:fact|random fact)$/i,()=>say('Did you know, '+T+'? '+pick(FACTS))],
+[/^(?:flip|flip a coin)$/i,()=>say('It landed on '+pick(['Heads','Tails'])+', '+T+'.')],
+[/^roll(?: (\d+))?$/i,m=>{const s=Math.max(2,+m[1]||6);say('You rolled a '+(1+Math.floor(Math.random()*s))+' on a d'+s+', '+T+'.')}],
+[/^riddle$/i,()=>{riddle=pick(RID);say(riddle[0]+' Say answer when you give up.')}],
+[/^(?:answer|give up|reveal)$/i,()=>{if(!riddle)return say('There is no riddle pending, '+T+'.');say('The answer is: '+riddle[1]);riddle=null}],
+[/^(?:show me|show|display)\s+(.+)$/i,m=>showPics(m[1])]];
+function run(raw){let c=raw.trim();if(!c)return;addLog('U',c);$('links').replaceChildren();c=c.replace(/^(hey |hi |ok |okay )?jarvis[,:]?\s*/i,'').replace(/^(please|can you|could you|would you)\s+/i,'').replace(/\s+please$/i,'').replace(/[.!?,]+$/,'').replace(/whats\s*app|what's\s*app|whatsap\b|watsapp/ig,'whatsapp').trim();for(const[r,f]of R){const m=c.match(r);if(m){try{return Promise.resolve(f(m,c)).catch(e=>say('Something went wrong, '+T+': '+e.message))}catch(e){return say('Something went wrong, '+T+': '+e.message)}}}say("I don't recognize that command, "+T+'. Say help.')}
+/* voice input */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec;
+function listen(){if(!SR)return say('Voice input needs Chrome on Android, '+T+'. You can still type.');if(listening)return;rec=new SR();rec.lang='en-US';rec.interimResults=true;
+rec.onstart=()=>{listening=true;$('mic').classList.add('on');$('hint').textContent='LISTENING ON'};
+rec.onresult=e=>{if(speaking)return;let t='';for(const r of e.results)t+=r[0].transcript;$('cmd').value=t;if(e.results[e.results.length-1].isFinal){$('cmd').value='';if(ear&&!/jarvis/i.test(t))return;run(t)}};
+rec.onerror=e=>{if(e.error=='not-allowed'||e.error=='service-not-allowed'){ear=false;$('earb').textContent='EAR: OFF';say('Microphone blocked, '+T+'. Allow it in the site settings.')}};
+rec.onend=()=>{listening=false;$('mic').classList.remove('on');$('hint').textContent='LISTENING OFF';if(ear)setTimeout(listen,400)};
+try{rec.start()}catch(e){}}
+$('mic').onclick=()=>{if(listening&&rec){ear=false;rec.stop()}else listen()};
+$('earb').onclick=()=>{ear=!ear;$('earb').textContent='EAR: '+(ear?'ON':'OFF');if(ear){say('I am listening, '+T+'. Start with my name.');listen()}else if(rec)rec.stop()};
+$('bar').onsubmit=e=>{e.preventDefault();const v=$('cmd').value;$('cmd').value='';run(v)};
+$('chatb').onclick=()=>showLog($('log').hidden);$('help').onclick=()=>run('help');$('nth').onclick=()=>run('theme next');$('nbg').onclick=()=>run('pick background');$('ncl').onclick=()=>run('close');$('vo').onclick=()=>run(voiceOn?'voice off':'voice on');
+/* buttons */
+[['WhatsApp','open whatsapp'],['YouTube','open youtube'],['Google','open google'],['Maps','open maps'],['Picture','show me a picture of ',1],['Weather','weather ',1],['Search','search ',1],['Call','call ',1],['Joke','joke'],['Notes','notes'],['Theme','theme next'],['Set BG','pick background']].forEach(([l,c,f])=>{const b=document.createElement('button');b.textContent=l;b.onclick=()=>{if(f){$('cmd').value=c;$('cmd').focus()}else run(c)};$('grid').append(b)});
+/* background */
+function applyBg(){document.body.style.backgroundImage=S.bg?'url('+S.bg+')':''}
+$('bgf').onchange=e=>{const f=e.target.files[0];if(!f)return;const im=new Image();im.onload=()=>{const s=Math.min(1,900/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*s;c.height=im.height*s;c.getContext('2d').drawImage(im,0,0,c.width,c.height);S.bg=c.toDataURL('image/jpeg',.75);save();applyBg();say('Background updated, '+T+'.')};im.src=URL.createObjectURL(f);e.target.value=''};
+/* hud + clock */
+const cv=$('rc'),x=cv.getContext('2d'),RM=matchMedia('(prefers-reduced-motion:reduce)').matches,FN='"Arial Narrow",Roboto,"Trebuchet MS",sans-serif';let ang=0,ph=0,lvl=0;
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+function arc(c,r,a,l,w,col){x.beginPath();x.arc(c,c,r,a,a+l);x.strokeStyle=col;x.lineWidth=w;x.stroke()}
+function ring(c,r,w,col){x.beginPath();x.arc(c,c,r,0,7);x.strokeStyle=col;x.lineWidth=w;x.stroke()}
+function draw(){const c=300,a=css('--a'),d=css('--d'),n=new Date(),s=n.getSeconds();ph+=.05;if(!RM)ang+=.006;lvl+=((speaking?1:listening?.6:0)-lvl)*.1;
+x.clearRect(0,0,600,600);
+for(let i=0;i<120;i++){const t=i/120*6.2832,b=i%10==0,r2=b?262:272;x.beginPath();x.moveTo(c+Math.cos(t)*284,c+Math.sin(t)*284);x.lineTo(c+Math.cos(t)*r2,c+Math.sin(t)*r2);x.strokeStyle=b?'#fff':d;x.lineWidth=b?5:2;x.stroke()}
+ring(c,296,2,d);ring(c,250,2,d);ring(c,192,2,d);
+arc(c,250,ang*3,1.3,7,a);arc(c,250,ang*3+3.4,.6,7,a);arc(c,192,-ang*4,2.2,4,a);
+for(let i=0;i<60;i++){const t=i/60*6.2832-1.5708,on=i<=s;x.beginPath();x.arc(c,c,222,t,t+.085);x.strokeStyle=on?(s-i<8?'#ff7a29':a):d;x.lineWidth=on?20:12;x.stroke()}
+x.strokeStyle=d;x.lineWidth=1;for(let k=1;k<5;k++){x.beginPath();x.ellipse(c,c,176,176*k/5,0,0,7);x.stroke();x.beginPath();x.ellipse(c,c,176*k/5,176,0,0,7);x.stroke()}
+ring(c,180+lvl*10*Math.abs(Math.sin(ph*5)),2+lvl*5,listening?'#ff3b3b':a);
+const h=n.getHours()%12||12,ts=h+':'+String(n.getMinutes()).padStart(2,'0');x.fillStyle='#fff';x.textBaseline='middle';x.textAlign='left';x.font='300 118px '+FN;const w=x.measureText(ts).width,x0=c-(w+74)/2;x.fillText(ts,x0,c);x.font='500 44px '+FN;x.fillText(n.getHours()<12?'AM':'PM',x0+w+16,c-24);x.fillText(String(s).padStart(2,'0'),x0+w+16,c+24);
+requestAnimationFrame(draw)}
+async function loadWx(){try{const [c,t,w]=(await tx('https://wttr.in/?format=%25l%7C%25t%7C%25C')).trim().split('|');$('wc').textContent=(c||'').split(',')[0].toUpperCase()||'WEATHER';$('wt').textContent=(t||'--').replace('+','');$('wd').textContent=w||''}catch(e){$('wc').textContent='WEATHER';$('wd').textContent='offline'}}
+function tick(){const n=new Date();$('dm').textContent=n.toLocaleDateString([],{month:'long'}).toUpperCase();$('dy').textContent=n.getFullYear();$('dd').textContent=n.getDate();$('dw').textContent=n.toLocaleDateString([],{weekday:'long'})}
+/* start */
+theme(S.theme);applyBg();draw();tick();setInterval(tick,60000);loadWx();setInterval(loadWx,6e5);
+const lines=['Initializing core...','Loading modules...','All systems online'];lines.forEach((t,i)=>setTimeout(()=>$('sub').textContent=t,i*500));
+setTimeout(()=>{const h=new Date().getHours();say('Good '+(h<12?'morning':h<18?'afternoon':'evening')+', '+T+'. All systems online and at your service.')},1700);
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script></body></html>
